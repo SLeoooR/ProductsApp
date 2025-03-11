@@ -12,6 +12,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.scottreganit.productsapp.databinding.FragmentProductBinding
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class ProductFragment : Fragment() {
 
@@ -53,9 +54,9 @@ class ProductFragment : Fragment() {
         binding.tvDescription.text = product.description
         val priceToString = "₱" + product.price.toString()
         binding.tvPrice.text = priceToString
-        val categoryStr = "Category: " + product.category
+        val categoryStr = "Category: " + product.category?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         binding.tvCategory.text = categoryStr
-        val brandStr = "Brand: " + product.brand
+        val brandStr = "Brand: " + (product.brand ?: "None")
         binding.tvBrand.text = brandStr
         try {
             Picasso.get().load(product.images?.get(0)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductOne)
