@@ -1,6 +1,7 @@
 package com.scottreganit.productsapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -56,8 +57,23 @@ class ProductFragment : Fragment() {
         binding.tvCategory.text = categoryStr
         val brandStr = "Brand: " + product.brand
         binding.tvBrand.text = brandStr
-        Picasso.get().load(product.images?.get(0)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductOne)
-        Picasso.get().load(product.images?.get(1)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductTwo)
-        Picasso.get().load(product.images?.get(2)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductThree)
+        try {
+            Picasso.get().load(product.images?.get(0)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductOne)
+        } catch (e: Exception) {
+            Log.d("error", e.localizedMessage?: "")
+            Picasso.get().load(R.drawable.ic_broken_image).into(binding.ivProductOne)
+        }
+        try {
+            Picasso.get().load(product.images?.get(1)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductTwo)
+        } catch (e: Exception) {
+            Log.d("error", e.localizedMessage?: "")
+            Picasso.get().load(R.drawable.ic_broken_image).into(binding.ivProductTwo)
+        }
+        try {
+            Picasso.get().load(product.images?.get(2)).error(R.drawable.ic_broken_image).placeholder(circularProgressDrawable).into(binding.ivProductThree)
+        } catch (e: Exception) {
+            Log.d("error", e.localizedMessage?: "")
+            Picasso.get().load(R.drawable.ic_broken_image).into(binding.ivProductThree)
+        }
     }
 }
