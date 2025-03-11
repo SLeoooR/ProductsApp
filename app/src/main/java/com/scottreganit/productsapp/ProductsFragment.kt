@@ -22,6 +22,12 @@ class ProductsFragment : Fragment() {
     }
 
     private lateinit var productsList: List<Product>
+    private val itemsPerPage = 10
+    private var itemsRemaining = 0
+    private var lastPage = 0
+    private var currentPage = 0
+    private var totalPages = 0
+    private lateinit var trimmedProducts: List<Product>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +36,16 @@ class ProductsFragment : Fragment() {
 
         lifecycleScope.launch {
             productsList = productService?.getProducts() ?: emptyList()
+        }
+
+        itemsRemaining = productsList.size % itemsPerPage
+        lastPage = productsList.size / itemsPerPage
+        totalPages = lastPage
+
+        trimmedProducts = if (productsList.size >= itemsPerPage) {
+            productsList.subList(0, itemsPerPage)
+        } else {
+            productsList
         }
     }
 
@@ -44,9 +60,84 @@ class ProductsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.rvProducts.layoutManager = LinearLayoutManager(this.context)
-        binding.rvProducts.adapter = ProductsListAdapter(productsList) {
+        binding.rvProducts.adapter = ProductsListAdapter(trimmedProducts) {
             val bundle = bundleOf("productId" to it)
             findNavController().navigate(R.id.action_productsFragment_to_productFragment, bundle)
+        }
+
+        toggleButtons()
+        setupBtnNext()
+        setupBtnPrev()
+    }
+
+    private fun toggleButtons() {
+        if (totalPages == 0) {
+            binding.btnNext.visibility = View.INVISIBLE
+            binding.btnNext.isEnabled = false
+
+            binding.btnPrev.visibility = View.INVISIBLE
+            binding.btnPrev.isEnabled = false
+        } else {
+            when (currentPage) {
+                totalPages - 1 -> {
+                    binding.btnNext.visibility = View.INVISIBLE
+                    binding.btnNext.isEnabled = false
+
+                    binding.btnPrev.visibility = View.VISIBLE
+                    binding.btnPrev.isEnabled = true
+                }
+                0 -> {
+                    binding.btnNext.visibility = View.VISIBLE
+                    binding.btnNext.isEnabled = true
+
+                    binding.btnPrev.visibility = View.INVISIBLE
+                    binding.btnPrev.isEnabled = false
+                }
+                in 1..totalPages -> {
+                    binding.btnNext.visibility = View.VISIBLE
+                    binding.btnNext.isEnabled = true
+
+                    binding.btnPrev.visibility = View.VISIBLE
+                    binding.btnPrev.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun updateRv() {
+        binding.rvProducts.layoutManager = LinearLayoutManager(this.context)
+        binding.rvProducts.adapter = ProductsListAdapter(trimmedProducts) {
+            val bundle = bundleOf("productId" to it)
+            findNavController().navigate(R.id.action_productsFragment_to_productFragment, bundle)
+        }
+    }
+
+    private fun setupBtnNext() {
+        binding.btnNext.setOnClickListener {
+            currentPage++
+            generateProducts(currentPage)
+            updateRv()
+            toggleButtons()
+        }
+    }
+
+    private fun setupBtnPrev() {
+        binding.btnPrev.setOnClickListener {
+            currentPage--
+            generateProducts(currentPage)
+            updateRv()
+            toggleButtons()
+        }
+    }
+
+    private fun generateProducts(currentPage: Int) {
+        val startItem = (currentPage * itemsPerPage) + 1
+        val numOfData = itemsPerPage
+
+        trimmedProducts = if (currentPage == lastPage && itemsRemaining > 0) {
+            productsList.subList(startItem - 1, (startItem + itemsRemaining) - 1)
+        } else {
+            productsList.subList(startItem - 1, (startItem + numOfData) - 1)
         }
     }
 }
