@@ -8,14 +8,14 @@
     <fragment
         android:id="@+id/productsFragment"
         android:name="com.scottreganit.productsapp.ProductsFragment"
-        android:label="fragment_first"
+        android:label="fragment_products"
         tools:layout="@layout/fragment_products" />
 
     <fragment
         android:id="@+id/productFragment"
-        android:name="com.scottreganit.productsapp.ProductsFragment"
-        android:label="fragment_first"
-        tools:layout="@layout/fragment_products" />
+        android:name="com.scottreganit.productsapp.ProductFragment"
+        android:label="fragment_products"
+        tools:layout="@layout/fragment_product" />
 
     <action
         android:id="@+id/action_productsFragment_to_productFragment"
